@@ -9,7 +9,17 @@ self.addEventListener('install', function (event) {
     caches.open(CACHE_NAME).then(function (cache) {
       // B6. TODO - Add all of the URLs from RECIPE_URLs here so that they are
       //            added to the cache when the ServiceWorker is installed
-      return cache.addAll(RECIPIES_URLS);
+      return cache.addAll([
+        ...RECIPE_URLS,
+        './', // Cache the root page
+        './index.html',
+        './assets/css/style.css',
+        './assets/js/main.js',
+        './assets/js/recipe-card.js',
+        './assets/images/icons/1x/icon.png',
+        './assets/images/icons/2x/icon.png',
+        './assets/images/icons/4x/icon.png'
+      ]);
     })
   );
 });
@@ -34,7 +44,29 @@ self.addEventListener('fetch', function (event) {
   /*******************************/
   // B7. TODO - Respond to the event by opening the cache using the name we gave
   //            above (CACHE_NAME)
-  // B8. TODO - If the request is in the cache, return with the cached version.
-  //            Otherwise fetch the resource, add it to the cache, and return
-  //            network response.
+  event.respondWith(
+    caches.open(CACHE_NAME).then(function (cache) {
+      return cache.match(event.request).then(function (cachedResponse) {
+      // B8. TODO - If the request is in the cache, return with the cached version.
+      //            Otherwise fetch the resource, add it to the cache, and return
+      //            network response.
+        if (cachedResponse) {
+          return cachedResponse; // Serve from cache
+        }
+
+        // Not in cache? Fetch from network, cache it, and return it
+        return fetch(event.request).then(function (networkResponse) {
+          // Only cache successful responses (avoid opaque responses)
+          if (networkResponse.ok && networkResponse.type !== 'opaque') {
+            cache.put(event.request, networkResponse.clone()); // Cache the new response
+          }
+          return networkResponse; // Return the fresh network response
+        }).catch(function (error) {
+          // Fallback if fetch fails (e.g., offline)
+          console.error('Fetch failed:', error);
+          return new Response('Offline fallback'); // Could return a cached offline page
+        });
+      });
+    })
+  );
 });
