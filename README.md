@@ -1,5 +1,5 @@
 # Lab8-Starter 
-Melissa De La Cruz
+Melissa De La Cruz, Joseph Eddy
 
 ## How are graceful degradation and service workers related?
 
