@@ -1,5 +1,5 @@
 # Lab8-Starter 
-Melissa De La Cruz, Joseph Eddy
+Joseph Eddy
 
 https://melissadelacruz.github.io/Lab8_Melissa/
 
